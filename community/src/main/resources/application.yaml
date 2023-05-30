@@ -6,7 +6,17 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  mail:
+    host: smtp.qq.com
+    username: 2425540101@qq.com
+    password: vdsnweeizoxwdhhe
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 
 mybatis-plus:
@@ -15,4 +25,6 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
   type-aliases-package: com.chenzhihui.community.entity
+
+
 
