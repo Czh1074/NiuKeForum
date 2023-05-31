@@ -29,20 +29,26 @@ public class MailTests {
     // 测试简单发送
     @Test
     public void MailTest() throws MessagingException {
-
-        mailUtil.sendMail("czh1074@163.com", "问候", "你好啊");
-
-    }
-
-    // 测试发送thymeleaf模版
-    @Test
-    public void testHtmlMail() throws MessagingException {
         Context context = new Context();
-        context.setVariable("username","黄雅婷");
-        String process = templateEngine.process("/mail/demo", context);
-        System.out.println(process);
-        mailUtil.sendMail("czh1074@163.com","HTMl", process);
-
+        context.setVariable("email", "czh1074@163.com");
+        // 点击链接完成验证 :
+        // todo：url这样拼接的作用是什么？
+//        String url = domain + "/activation/" + user.getId() + "/" + user.getActivationCode();
+        context.setVariable("url", "xx");
+//        mailUtil.sendMail("czh1074@163.com", "问候", "你好啊");
+        String content = templateEngine.process("/mail/activation", context);
+        System.out.println("我在发送邮件之前");
+        mailUtil.sendMail("czh1074@163.com", "激活账号", content);
 
     }
+
+//    // 测试发送thymeleaf模版
+//    @Test
+//    public void testHtmlMail() throws MessagingException {
+////        Context context = new Context();
+////        context.setVariable("username","黄雅婷");
+////        String process = templateEngine.process("/mail/demo", context);
+////        System.out.println(process);
+//        mailUtil.sendMail("czh1074@163.com","HTMl", "黄雅婷");
+//    }
 }

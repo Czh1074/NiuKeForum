@@ -40,6 +40,7 @@ public class DiscussPostController extends ApiController {
     private UserService userService;
 
 
+    // 首页展示
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String selectAllDiscussPost(Model model, Pages pages){
         // 方法调用栈、SpringMVC会自动实例化Model和Page，并将Page注入Model中

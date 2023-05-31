@@ -15,6 +15,14 @@
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <sql id="insertFields">
+        username, password, salt, email, type, status, activation_code, header_url, create_time
+    </sql>
+
+    <sql id="selectFields">
+        id, username, password, salt, email, type, status, activation_code, header_url, create_time
+    </sql>
+
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
         insert into community.user(username, password, salt, email, type, status, activation_code, header_url, create_time)
@@ -31,7 +39,32 @@
             (#{entity.username}, #{entity.password}, #{entity.salt}, #{entity.email}, #{entity.type}, #{entity.status}, #{entity.activationCode}, #{entity.headerUrl}, #{entity.createTime})
         </foreach>
         on duplicate key update
-         username = values(username) , password = values(password) , salt = values(salt) , email = values(email) , type = values(type) , status = values(status) , activation_code = values(activation_code) , header_url = values(header_url) , create_time = values(create_time)     </insert>
+         username = values(username) , password = values(password) , salt = values(salt) , email = values(email) , type = values(type) , status = values(status) , activation_code = values(activation_code) , header_url = values(header_url) , create_time = values(create_time)
+    </insert>
+
+
+   <insert id="insertUser" parameterType="user"  keyProperty="id" useGeneratedKeys="true">
+       insert into user (<include refid="insertFields"></include>)
+       values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
+   </insert>
+
+    <select id="selectByName" resultType="User">
+        select * from community.user
+        where username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultType="User">
+        select * from community.user
+        where username = #{email}
+    </select>
+
+    <update id="updateStatus" parameterType="int" >
+        update user set status = 1
+        where id = #{id}
+    </update>
+
+
+
 
 </mapper>
 

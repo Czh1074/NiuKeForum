@@ -1,6 +1,7 @@
 package com.chenzhihui.community.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,6 +14,23 @@ import com.chenzhihui.community.entity.User;
  * @since 2023-05-19 23:43:01
  */
 public interface UserMapper extends BaseMapper<User> {
+    /**
+     * 实现用户注册逻辑
+     *
+     * @param user 用户信息（主要是账号、密码）
+     * @return Map 返回一些判断信息
+     */
+    Map<String, Object> register(User user);
+
+    /**
+     * 实现用户激活判断
+     *
+     * @param id,code 用户id、激活码
+     * @return int 0、1、2 成功、重复、失败
+     */
+    int activation(Integer id, String code);
+
+
 
     /**
     * 批量新增数据（MyBatis原生foreach方法）
@@ -31,13 +49,6 @@ public interface UserMapper extends BaseMapper<User> {
     */
     int insertOrUpdateBatch(@Param("entities") List<User> entities);
 
-//    /**
-//     * 通过id查找用户
-//     *
-//     * @param id int 用户id
-//     * @return User
-//     */
-//    User selectById(int id);
 
     /**
      * 通过username查找用户

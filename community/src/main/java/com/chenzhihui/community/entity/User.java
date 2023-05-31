@@ -1,8 +1,11 @@
 package com.chenzhihui.community.entity;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -13,7 +16,8 @@ import java.util.Date;
  */
 @SuppressWarnings("serial")
 public class User extends Model<User> {
-    
+
+    @TableId(type =  IdType.AUTO)
     private Integer id;
     
     private String username;
@@ -115,14 +119,47 @@ public class User extends Model<User> {
         this.createTime = createTime;
     }
 
-    /**
-     * 获取主键值
-     *
-     * @return 主键值
-     */
+//    /**
+//     * 获取主键值
+//     *
+//     * @return 主键值
+//     */
+//    @Override
+//    protected Serializable pkVal() {
+//        return this.id;
+//    }
+
+
+    public User(Integer id, String username, String password, String salt, String email, Integer type, Integer status, String activationCode, String headerUrl, Date createTime) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.salt = salt;
+        this.email = email;
+        this.type = type;
+        this.status = status;
+        this.activationCode = activationCode;
+        this.headerUrl = headerUrl;
+        this.createTime = createTime;
+    }
+
+    public User() {
+    }
+
     @Override
-    protected Serializable pkVal() {
-        return this.id;
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", salt='" + salt + '\'' +
+                ", email='" + email + '\'' +
+                ", type=" + type +
+                ", status=" + status +
+                ", activationCode='" + activationCode + '\'' +
+                ", headerUrl='" + headerUrl + '\'' +
+                ", createTime=" + createTime +
+                '}';
     }
-    }
+}
 
