@@ -4,9 +4,11 @@ import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityConstant;
 import com.google.code.kaptcha.Producer;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
@@ -94,7 +97,43 @@ public class LoginController implements CommunityConstant {
         // 图片返回的时候，要设置输出流、并且以ImageIO的方式写回去
         ServletOutputStream outputStream = response.getOutputStream();
         ImageIO.write(image,"png",outputStream);
+    }
 
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String login(String username, String password, String code, boolean rememberme,
+                        Model model, HttpSession session, HttpServletResponse response) {
 
+        // 检查验证码
+        String kaptcha = (String) session.getAttribute("kaptcha");
+        System.out.println("code = " + code);
+        System.out.println("kaptcha = " + kaptcha);
+        if(StringUtils.isBlank(kaptcha) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(kaptcha)) {
+            model.addAttribute("codeMsg", "验证码不正确！");
+            return "/site/login";
+        }
+
+        // 检查账号，密码
+        int expiredSeconds =  rememberme ? REMEMBER_EXPIRED_SECONDS : DEFAULT_EXPIRED_SECONDS;
+
+        Map<String, Object> map = userService.login(username, password, expiredSeconds);
+        if(map.containsKey("ticket")) { // 登录成功
+            // 生成cookie
+            Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
+            cookie.setPath("/");
+            cookie.setMaxAge(expiredSeconds);
+            response.addCookie(cookie);
+            return "redirect:/index";
+        } else {
+            model.addAttribute("usernameMsg", map.get("usernameMsg"));
+            model.addAttribute("passwordMsg", map.get("passwordMsg"));
+            return "/site/login";
+        }
+
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public String loginOut(@CookieValue("ticket") String ticket) {
+        userService.logout(ticket);
+        return "redirect:/login";
     }
 }

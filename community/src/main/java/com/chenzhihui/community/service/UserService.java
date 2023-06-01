@@ -42,6 +42,26 @@ public interface UserService extends IService<User> {
     User selectById(int id);
 
     /**
+     * 登录测试
+     *
+     * @param username,password,expiredSeconds 用户名称、密码、过期时间
+     * @return Map 判断消息
+     */
+    Map<String, Object> login(String username, String password, int expiredSeconds);
+
+    /**
+     * 退出登录
+     *
+     * @param ticket 登录凭证
+     */
+    void logout(String ticket);
+
+
+    /** -------------------------------------------------------------------------------------------------------------**/
+
+
+
+    /**
      * 通过username查找用户
      *
      * @param username String 用户id
