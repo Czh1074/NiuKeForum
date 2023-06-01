@@ -3,6 +3,7 @@ package com.chenzhihui.community.controller;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityConstant;
+import com.google.code.kaptcha.Producer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -23,6 +30,9 @@ public class LoginController implements CommunityConstant {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private Producer kaptchaProducer;
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String getRegisterPage(){
@@ -65,5 +75,26 @@ public class LoginController implements CommunityConstant {
             model.addAttribute("target", "/index");
         }
         return "/site/operate-result";
+    }
+
+
+    @RequestMapping(value = "/kaptcha", method = RequestMethod.GET)
+    public void getKaptcha(HttpServletResponse response, HttpSession session) throws IOException {
+
+        // 生成验证码
+        String text = kaptchaProducer.createText();
+        // 通过验证码，生成对应的图片
+        BufferedImage image = kaptchaProducer.createImage(text);
+
+        // 将验证码存入session智能鼓
+        session.setAttribute("kaptcha", text);
+
+        // 将图片返回给浏览器
+        response.setContentType("image/png");
+        // 图片返回的时候，要设置输出流、并且以ImageIO的方式写回去
+        ServletOutputStream outputStream = response.getOutputStream();
+        ImageIO.write(image,"png",outputStream);
+
+
     }
 }
