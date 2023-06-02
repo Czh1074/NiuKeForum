@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chenzhihui.community.annotation.LoginRequired;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityUtil;
@@ -62,13 +63,14 @@ public class UserController extends ApiController {
         return userService.selectById(id);
     }
 
+    @LoginRequired
     @RequestMapping(value = "/setting", method = RequestMethod.GET)
     public String getUserSettingPage(){
         System.out.println("有请求发送到：个人主页设置界面！");
         return "/site/setting";
     }
 
-
+    @LoginRequired
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) throws IOException {
         // 1、判断上传的图片是否为空
