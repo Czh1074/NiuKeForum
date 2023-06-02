@@ -188,6 +188,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public int updateHeader(int id, String headerUrl) {
+        return userMapper.updateHeader(id, headerUrl);
+    }
+
+
+    /**--------------------------------------------------------------------------------------------------------------**/
+
+    @Override
     public User selectByName(String username) {
         return null;
     }
@@ -207,10 +215,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return 0;
     }
 
-    @Override
-    public int updateHeader(int id, String headerUrl) {
-        return 0;
-    }
 
     @Override
     public int updatePassword(int id, String password) {

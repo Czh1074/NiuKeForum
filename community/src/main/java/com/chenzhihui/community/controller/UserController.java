@@ -8,10 +8,21 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.util.CommunityUtil;
+import com.chenzhihui.community.util.HostHolder;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -20,7 +31,7 @@ import java.util.List;
  * @author makejava
  * @since 2023-05-19 23:42:59
  */
-@RestController
+@Controller
 @RequestMapping("/user")
 public class UserController extends ApiController {
 
@@ -29,6 +40,15 @@ public class UserController extends ApiController {
      */
     @Resource
     private UserService userService;
+
+    @Value("${community.path.upload}")
+    private String uploadPath;
+
+    @Value("${community.path.domain}")
+    private String domain;
+
+    @Autowired
+    private HostHolder hostHolder;
 
     /**
      * 通过id查找用户
@@ -41,6 +61,69 @@ public class UserController extends ApiController {
         System.out.println("id = " + id);
         return userService.selectById(id);
     }
+
+    @RequestMapping(value = "/setting", method = RequestMethod.GET)
+    public String getUserSettingPage(){
+        System.out.println("有请求发送到：个人主页设置界面！");
+        return "/site/setting";
+    }
+
+
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public String uploadHeader(MultipartFile headerImage, Model model) throws IOException {
+        // 1、判断上传的图片是否为空
+        if (headerImage == null){
+            model.addAttribute("error", "您还没有选择图片！");
+            return "/site/setting";
+        }
+        // 2、得到文件名 -> 因为可能很多人存的文件是一样的，所以我们需要将该文件以一定的命名规则重新存储
+        String filename = headerImage.getOriginalFilename();
+        // 3、得到文件的尾部，文件格式
+        String suffix = filename.substring(filename.lastIndexOf("."));
+        if(StringUtils.isBlank(suffix)){
+            model.addAttribute("error", "您上传的文件格式有误，请重新上传！");
+            return "/site/setting";
+        }
+        // 4、组装成新的文件名
+        filename = CommunityUtil.generateUUID() + suffix;
+        // 5、确定文件存放的路径
+        File file = new File(uploadPath + "/" + filename);
+        // 6、存储文件
+        headerImage.transferTo(file);
+
+        // 7、存储完文件，就是要用户的头像 -> 前提：通过hostHolder获取当前用户
+        // 格式：http://localhost:8080/user/header/xxx.png
+        User user = hostHolder.getUser();
+        String headerurl = domain + "/user/header/" + filename;
+        userService.updateHeader(user.getId(), headerurl);
+        return "redirect:/index";
+    }
+
+    // 网站获取本地头像
+    @RequestMapping(value = "/header/{filename}", method = RequestMethod.GET)
+    public void getHeaderImage(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
+        // 先拿到服务器的存放地址(现在是本地)
+        filename = uploadPath + "/" + filename;
+        // 文件后缀
+        String suffix = filename.substring(filename.indexOf("."));
+        // 响应图片: 现在响应的是图片，后缀名为suffix
+        response.setContentType("image/" + suffix);
+        // 指定我们要读取的内容
+        FileInputStream fis = new FileInputStream(filename);
+        // 获取响应对象的输出流
+        OutputStream os = response.getOutputStream();
+        byte[] buffer = new byte[1024];
+        int b = 0;
+        while ( (b = fis.read(buffer)) != -1){
+            os.write(buffer, 0, b);
+        }
+        fis.close();
+        os.close();
+    }
+
+
+
+    //----------------------------------------------------------------------------------------------------------------//
 
 
     /**

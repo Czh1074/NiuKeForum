@@ -56,6 +56,14 @@ public interface UserService extends IService<User> {
      */
     void logout(String ticket);
 
+    /**
+     * 修改用户头像
+     *
+     * @param id,headUrl int,String 用户id和用户头像url地址
+     * @return 是否修改成功
+     */
+    int updateHeader(int id, String headerUrl);
+
 
     /** -------------------------------------------------------------------------------------------------------------**/
 
@@ -93,13 +101,6 @@ public interface UserService extends IService<User> {
      */
     int updateStatus(int id, int status);
 
-    /**
-     * 修改用户头像
-     *
-     * @param id,headUrl int,String 用户id和用户头像url地址
-     * @return 是否修改成功
-     */
-    int updateHeader(int id, String headerUrl);
 
     /**
      * 修改用户密码

@@ -34,6 +34,7 @@ mybatis-plus:
 community:
   path:
     domain: http://localhost:8080
+    upload: /Users/chenzhihui/Desktop/JavaProject/NiuKeForumData/NiuKeForum/upload
 
 
 
