@@ -32,7 +32,7 @@ public class LoginRequiredInterceptor implements HandlerInterceptor {
             Method method = handlerMethod.getMethod(); // 获取当前对方法
             LoginRequired loginRequired = method.getAnnotation(LoginRequired.class); // 判断这个方法有没有加注解
             if (loginRequired != null && hostHolder.getUser() == null){ // 如果需要用LoginRequired进行登录验证并且用户未登录
-                response.sendRedirect(request.getContextPath()); // 重定向到首页
+                response.sendRedirect("http://localhost:8080/login"); // 重定向到登录页面
                 return false; // 表示拦截请求
             }
         }
