@@ -19,7 +19,7 @@ public interface LoginTicketMapper extends BaseMapper<LoginTicket> {
 
     // 通过登录凭证，修改用户状态
     @Update({
-            "update login_ticket set status = #{status} where ticket = #{ticket}}"
+            "update login_ticket set status = #{status} where ticket = #{ticket}"
     })
     int updateStatus(String ticket, int status);
 }

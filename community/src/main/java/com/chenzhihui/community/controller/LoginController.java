@@ -5,6 +5,8 @@ import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityConstant;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +32,8 @@ import java.util.Map;
  **/
 @Controller
 public class LoginController implements CommunityConstant {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private UserService userService;
