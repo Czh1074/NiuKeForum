@@ -11,16 +11,16 @@ import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.util.CommunityUtil;
+import com.chenzhihui.community.util.HostHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * (DiscussPost)表控制层
@@ -38,6 +38,9 @@ public class DiscussPostController extends ApiController {
 
     @Resource
     private UserService userService;
+
+    @Autowired
+    private HostHolder hostHolder;
 
 
     // 首页展示
@@ -66,7 +69,28 @@ public class DiscussPostController extends ApiController {
         return "/index";
     }
 
+    @RequestMapping(value = "/discussPost/add", method = RequestMethod.POST)
+    @ResponseBody
+    public String insertDiscussPost(String title, String content) {
+        // 1、获取当前用户
+        User user = hostHolder.getUser();
+        if (user == null) {
+            return CommunityUtil.getJsonString(403, "您还未登录，清闲登录");
+        }
+        // 2、调用service层方法
+        // 3、新建一个DiscussPost对象
+        DiscussPost discussPost = new DiscussPost();
+        discussPost.setUserId(user.getId());
+        discussPost.setTitle(title);
+        discussPost.setContent(content);
+        discussPost.setCreateTime(new Date());
 
+        discussPostService.insertDiscussPost(discussPost);
+        return CommunityUtil.getJsonString(0, "发布成功！");
+    }
+
+
+    /**--------------------------------------------------------------------------------------------------------------**/
 
 
     /**

@@ -7,7 +7,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.entity.DiscussPost;
 import com.chenzhihui.community.service.DiscussPostService;
+import com.chenzhihui.community.util.SensitiveFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -24,6 +27,9 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
 
     @Resource
     private DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
 
     @Override
     public List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit) {
@@ -51,6 +57,24 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
         queryWrapper.eq("user_id", userId);
         List<DiscussPost> discussPosts = discussPostMapper.selectList(queryWrapper);
         return discussPosts;
+    }
+
+    @Override
+    public int insertDiscussPost(DiscussPost discussPost) {
+        // 1、判断传递进来的discussPost是否为空
+        if (discussPost == null){
+            throw new IllegalArgumentException("参数不能为空！");
+        }
+        // 2、转义HTML标记
+        discussPost.setTitle(HtmlUtils.htmlEscape(discussPost.getTitle()));
+        discussPost.setContent(HtmlUtils.htmlEscape(discussPost.getContent()));
+        // 3、过滤敏感词
+        String title = sensitiveFilter.filter(discussPost.getTitle());
+        String content = sensitiveFilter.filter(discussPost.getContent());
+        discussPost.setTitle(title);
+        discussPost.setContent(content);
+        // 4、执行插入
+        return discussPostMapper.insertDiscussPost(discussPost);
     }
 }
 

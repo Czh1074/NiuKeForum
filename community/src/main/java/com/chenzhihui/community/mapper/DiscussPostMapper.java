@@ -31,6 +31,19 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
     List<DiscussPost> selectAllDiscussPosts(int userId);
 
     /**
+     * 发布帖子
+     *
+     * @param discussPost 帖子信息
+     * @return int 插入成功的条数
+     */
+    int insertDiscussPost(DiscussPost discussPost);
+
+
+
+    /**--------------------------------------------------------------------------------------------------------------**/
+
+
+    /**
     * 批量新增数据（MyBatis原生foreach方法）
     *
     * @param entities List<DiscussPost> 实例对象列表

@@ -30,7 +30,14 @@
             (#{entity.userId}, #{entity.title}, #{entity.content}, #{entity.type}, #{entity.status}, #{entity.createTime}, #{entity.commentCount}, #{entity.score})
         </foreach>
         on duplicate key update
-         user_id = values(user_id) , title = values(title) , content = values(content) , type = values(type) , status = values(status) , create_time = values(create_time) , comment_count = values(comment_count) , score = values(score)     </insert>
+         user_id = values(user_id) , title = values(title) , content = values(content) , type = values(type) , status = values(status) , create_time = values(create_time) , comment_count = values(comment_count) , score = values(score)
+    </insert>
+
+    <insert id="insertDiscussPost" parameterType="DiscussPost">
+        insert into discuss_post(user_id, title, content, type, status, create_time, comment_count, score)
+        values
+        (#{userId}, #{title}, #{content}, #{type}, #{status}, #{createTime}, #{commentCount}, #{score})
+    </insert>
 
 </mapper>
 

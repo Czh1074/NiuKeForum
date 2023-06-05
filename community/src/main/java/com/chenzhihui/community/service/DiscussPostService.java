@@ -17,5 +17,7 @@ public interface DiscussPostService extends IService<DiscussPost> {
 
     List<DiscussPost> selectAllDiscussPosts(int userId);
 
+    int insertDiscussPost(DiscussPost discussPost);
+
 }
 
