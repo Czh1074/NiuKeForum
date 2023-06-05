@@ -29,7 +29,21 @@
             (#{entity.userId}, #{entity.entityType}, #{entity.entityId}, #{entity.targetId}, #{entity.content}, #{entity.status}, #{entity.createTime})
         </foreach>
         on duplicate key update
-         user_id = values(user_id) , entity_type = values(entity_type) , entity_id = values(entity_id) , target_id = values(target_id) , content = values(content) , status = values(status) , create_time = values(create_time)     </insert>
+         user_id = values(user_id) , entity_type = values(entity_type) , entity_id = values(entity_id) , target_id = values(target_id) , content = values(content) , status = values(status) , create_time = values(create_time)
+    </insert>
+
+    <select id="selectCommentsByEntity" resultType="Comment">
+        select id, user_id, entity_type, entity_id, target_id, content, status, create_time
+        from comment
+        where #entity_type = {entityType}, #entity_id = {entityId}
+
+    </select>
+
+    <select id="selectCountByEntity" resultType="Integer">
+        select count(id)
+        from comment
+        where status = 0 and entity_type = #{entityType} and entity_id = #{entityId}
+    </select>
 
 </mapper>
 

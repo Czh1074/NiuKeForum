@@ -23,7 +23,7 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
     List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit);
 
     /**
-     * 查询帖子的信息
+     * 查询帖子列表
      *
      * @param userId 用户id
      * @return List<DiscussPost> 实例对象列表
@@ -38,6 +38,13 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      */
     int insertDiscussPost(DiscussPost discussPost);
 
+    /**
+     * 查询帖子信息
+     *
+     * @param id 帖子id
+     * @return DiscussPost 帖子信息
+     */
+    DiscussPost selectDiscussPostById(int id);
 
 
     /**--------------------------------------------------------------------------------------------------------------**/

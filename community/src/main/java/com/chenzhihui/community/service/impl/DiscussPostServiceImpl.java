@@ -76,5 +76,10 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
         // 4、执行插入
         return discussPostMapper.insertDiscussPost(discussPost);
     }
+
+    @Override
+    public DiscussPost selectDiscussPostById(int id) {
+        return discussPostMapper.selectDiscussPostById(id);
+    }
 }
 

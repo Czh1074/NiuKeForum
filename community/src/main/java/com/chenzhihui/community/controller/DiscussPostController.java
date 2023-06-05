@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.entity.DiscussPost;
 import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
+import com.chenzhihui.community.service.CommentService;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.util.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.jws.WebParam;
 import java.io.Serializable;
 import java.util.*;
 
@@ -29,12 +33,15 @@ import java.util.*;
  * @since 2023-05-19 23:47:05
  */
 @Controller
-public class DiscussPostController extends ApiController {
+public class DiscussPostController extends ApiController implements CommunityConstant {
     /**
      * 服务对象
      */
     @Resource
     private DiscussPostService discussPostService;
+
+    @Resource
+    private CommentService commentService;
 
     @Resource
     private UserService userService;
@@ -45,12 +52,12 @@ public class DiscussPostController extends ApiController {
 
     // 首页展示
     @RequestMapping(value = "/index", method = RequestMethod.GET)
-    public String selectAllDiscussPost(Model model, Pages pages){
+    public String selectAllDiscussPost(Model model, Pages pages) {
         // 方法调用栈、SpringMVC会自动实例化Model和Page，并将Page注入Model中
         // 所以，在thymeleaf中可以直接访问Page这中对象的数据
-        List<DiscussPost> list = discussPostService.selectDiscussPosts(103, pages.getCurrent(), pages.getLimit());
+        List<DiscussPost> list = discussPostService.selectDiscussPosts(149, pages.getCurrent(), pages.getLimit());
         // 这里的rows需要查找所有的信息
-        int all = discussPostService.selectAllDiscussPosts(103).size();
+        int all = discussPostService.selectAllDiscussPosts(149).size();
         pages.setRows(all);
         System.out.println(all);
         pages.setPath("/index");
@@ -87,6 +94,71 @@ public class DiscussPostController extends ApiController {
 
         discussPostService.insertDiscussPost(discussPost);
         return CommunityUtil.getJsonString(0, "发布成功！");
+    }
+
+    @RequestMapping(value = "/discuss/detail/{id}", method = RequestMethod.GET)
+    public String selectDiscussPostById(@PathVariable("id") int id, Model model, Pages pages) {
+        System.out.println("我进来帖子详情页！！！！");
+        // 通过discussPostId查找得到帖子信息
+        DiscussPost discussPost = discussPostService.selectDiscussPostById(id);
+        model.addAttribute("post",discussPost);
+
+        // 作者
+        User user = userService.selectById(discussPost.getUserId());
+        model.addAttribute("user", user);
+
+        // 评论分页设置
+        pages.setRows(discussPost.getCommentCount());
+        pages.setPath("/discuss/detail/" + id);
+        model.addAttribute("pages", pages);
+
+        // 我们统一定义：帖子的评论成为评论、评论的评论成为回复
+        // 评论列表 -> 需要分页处理
+        List<Comment> commentList = commentService.selectCommentsByEntity(ENTITY_TYPE_POST, id,
+                pages.getCurrent(), pages.getLimit());
+
+        // 评论VO列表，也就是不仅仅是评论信息还包含用户对象等的信息
+        List<Map<String, Object>> commentVoList = new ArrayList<>();
+        if(commentList != null){
+            for(Comment comment : commentList) {
+                // 评论Vo
+                HashMap<String, Object> commentVo = new HashMap<>();
+                // 评论
+                commentVo.put("comment", comment);
+                // 作者
+                commentVo.put("user",userService.selectById(comment.getUserId()));
+                // 回复列表
+                List<Comment> replyList = commentService.selectCommentsByEntity(ENTITY_TYPE_COMMENT, comment.getId(),
+                        0, Integer.MAX_VALUE);
+                // 回复Vo列表
+                List<Map<String, Object>> replyVoList = new ArrayList<>();
+                if(replyList != null) {
+                    for(Comment reply : replyList) {
+                        // 回复Vo
+                        HashMap<String, Object> replyVo = new HashMap<>();
+                        // 回复
+                        replyVo.put("reply", reply);
+                        // 作者
+                        replyVo.put("user", userService.selectById(reply.getUserId()));
+                        // 回复目标
+                        User target = reply.getTargetId() == 0 ? null : userService.selectById(reply.getTargetId());
+                        replyVo.put("target", target);
+                        replyVoList.add(replyVo);
+                    }
+                }
+                commentVo.put("replys", replyVoList);
+                // 回复数量
+                int replyCount = commentService.selectCountByEntity(ENTITY_TYPE_COMMENT, comment.getEntityId());
+                commentVo.put("replyCount", replyCount);
+
+                commentVoList.add(commentVo);
+            }
+        }
+
+        model.addAttribute("comments", commentVoList);
+
+
+        return "/site/discuss-detail";
     }
 
 
