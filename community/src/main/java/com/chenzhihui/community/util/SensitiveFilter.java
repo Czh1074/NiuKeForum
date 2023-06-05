@@ -136,7 +136,7 @@ public class SensitiveFilter {
                 position = ++begin;
                 point1 = rootNode;
             } else if (point1.isKeywordEnd()) {
-                // 发现敏感词
+            // 发现敏感词
                 sb.append(REPLACEMENT);
                 begin = ++position;
                 point1 = rootNode;
