@@ -25,7 +25,7 @@ public class Message extends Model<Message> {
     private String content;
 
     //0-未读;1-已读;2-删除;
-    private Integer status;
+    private Integer status = 0;
     
     private Date createTime;
 

@@ -28,5 +28,11 @@ public interface MessageService extends IService<Message> {
     // 查询未读私信的数量（左上角）
     int selectLetterUnreadCount(int userId, String conversationId);
 
+    // 新增消息-发送私信
+    int insertMessage(Message message);
+
+    // 修改消息阅读状态
+    int readMessage(List<Integer> ids);
+
 }
 

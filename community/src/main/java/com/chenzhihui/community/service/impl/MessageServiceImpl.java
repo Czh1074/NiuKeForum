@@ -9,8 +9,10 @@ import com.chenzhihui.community.mapper.MessageMapper;
 import com.chenzhihui.community.entity.Message;
 import com.chenzhihui.community.service.MessageService;
 import com.chenzhihui.community.util.HostHolder;
+import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -28,6 +30,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Resource
     private MessageMapper messageMapper;
+
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
 
     // 查询当前用户对会话列表，针对每个会话返回一条最新的私信
     @Override
@@ -65,6 +70,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         queryWrapper.eq("conversation_id", conversationId);
         queryWrapper.ne("status",2);
         queryWrapper.ne("from_id",1);
+        queryWrapper.orderByDesc("create_time");
         IPage<Message> messageIPage = messageMapper.selectPage(page, queryWrapper);
         // 结果List
         ArrayList<Message> messages = new ArrayList<>();
@@ -85,5 +91,20 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     public int selectLetterUnreadCount(int userId, String conversationId) {
         return messageMapper.selectLetterUnreadCount(userId, conversationId);
     }
+
+    // 新增私信
+    @Override
+    public int insertMessage(Message message) {
+        message.setContent(HtmlUtils.htmlEscape(message.getContent()));
+        message.setContent(sensitiveFilter.filter(message.getContent()));
+        return messageMapper.insertMessage(message);
+    }
+
+    @Override
+    public int readMessage(List<Integer> ids) {
+        System.out.println("我先在执行messageService中的设置已读方法");
+        return messageMapper.updateStatus(ids, 1);
+    }
+
 }
 

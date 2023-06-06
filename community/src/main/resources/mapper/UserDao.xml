@@ -54,7 +54,7 @@
     </select>
 
     <select id="selectByName" resultType="User">
-        select * from community.user
+        select <include refid="selectFields"></include> from community.user
         where username = #{username}
     </select>
 

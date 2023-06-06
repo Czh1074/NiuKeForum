@@ -11,6 +11,7 @@ import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.MessageService;
 import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * (Message)表控制层
@@ -78,6 +76,7 @@ public class MessageController extends ApiController {
         // 分页显示设置
         pages.setPath("/site/detail/" + conversationId);
         pages.setRows(messageService.selectLetterCount(conversationId));
+        pages.setLimit(6);
 
         // 得到会话内容列表
         List<Message> messageList = messageService.selectLetters(conversationId, pages.getCurrent(), pages.getLimit());
@@ -94,12 +93,19 @@ public class MessageController extends ApiController {
         model.addAttribute("letters", letters);
 
         // 私信的目标
-        model.addAttribute("target", getLettertarget(conversationId));
+        model.addAttribute("target", getLetterTarget(conversationId));
+
+        // 设置已读
+        List<Integer> ids = getLetterIds(messageList);
+        System.out.println("当前是否有未读的私信：" + ids.isEmpty());
+        if(!ids.isEmpty()) {
+            messageService.readMessage(ids);
+        }
 
         return "/site/letter-detail";
     }
 
-    private User getLettertarget(String conversationId) {
+    private User getLetterTarget(String conversationId) {
         String[] str = conversationId.split("_");
         int id1 = Integer.parseInt(str[0]);
         int id2 = Integer.parseInt(str[1]);
@@ -108,6 +114,47 @@ public class MessageController extends ApiController {
         }
         return userService.selectById(id1);
     }
+
+    // 通过当前用户评论or回复来判断，是否被访问，进行状态的修改
+    private List<Integer> getLetterIds(List<Message> letterList) {
+        ArrayList<Integer> ids = new ArrayList<>();
+        if(letterList != null) {
+            for(Message message : letterList) {
+                if(hostHolder.getUser().getId().intValue() == message.getToId() && message.getStatus() == 0){
+                    ids.add(message.getId());
+                }
+            }
+        }
+        return ids;
+    }
+
+
+    @RequestMapping(value = "/letter/send", method = RequestMethod.POST)
+    @ResponseBody
+    public String sendLetter(String toName, String content){
+        User target = userService.selectByName(toName); // 判断目标在不在
+        System.out.println("接收到的name是什么" + toName);
+        if(target == null) {
+            return CommunityUtil.getJsonString(1,"目标用户不存在！");
+        }
+        // 设置需要发送的消息
+        Message message = new Message();
+        message.setFromId(hostHolder.getUser().getId());
+        message.setToId(target.getId());
+        if(message.getFromId() < message.getToId()) {
+            message.setConversationId(message.getFromId() + "_" + message.getToId());
+        } else {
+            message.setConversationId(message.getToId() + "_" + message.getFromId());
+        }
+        message.setContent(content);
+        message.setCreateTime(new Date());
+        messageService.insertMessage(message);
+        return CommunityUtil.getJsonString(0);
+    }
+
+
+
+
 
 
     /**--------------------------------------------------------------------------------------------------------------**/
