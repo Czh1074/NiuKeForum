@@ -33,6 +33,14 @@ public interface CommentMapper extends BaseMapper<Comment> {
      */
     int selectCountByEntity(int entityType, int entityId);
 
+    /**
+     * 通过类型和帖子id、评论内容添加评论
+     *
+     * @param discussPostId,content 帖子Id、评论内容
+     * @return int 插入成功条数
+     */
+    int addComment(Comment comment);
+
     /**--------------------------------------------------------------------------------------------------------------**/
 
 

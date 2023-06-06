@@ -17,5 +17,7 @@ public interface CommentService extends IService<Comment> {
 
     int selectCountByEntity(int entityType, int entityId);
 
+    int addComment(Comment comment);
+
 }
 

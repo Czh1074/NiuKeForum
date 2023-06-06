@@ -45,5 +45,10 @@
         where id = #{id}
     </select>
 
+    <update id="updateDiscussCount" >
+        update discuss_post set comment_count = #{count}
+        where id = #{discussPostId}
+    </update>
+
 </mapper>
 

@@ -48,6 +48,11 @@
        values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
    </insert>
 
+    <select id="selectById" resultType="User">
+        select * from community.user
+        where id = #{id}
+    </select>
+
     <select id="selectByName" resultType="User">
         select * from community.user
         where username = #{username}

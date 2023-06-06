@@ -45,5 +45,11 @@
         where status = 0 and entity_type = #{entityType} and entity_id = #{entityId}
     </select>
 
+    <insert id="addComment" parameterType="Comment">
+        insert into comment(user_id, entity_type, entity_id, target_id, content, status, create_time)
+        values
+        (#{userId}, #{entityType}, #{entityId}, #{targetId}, #{content}, #{status}, #{createTime})
+    </insert>
+
 </mapper>
 

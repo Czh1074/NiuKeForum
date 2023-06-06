@@ -141,7 +141,7 @@ public class DiscussPostController extends ApiController implements CommunityCon
                         // 作者
                         replyVo.put("user", userService.selectById(reply.getUserId()));
                         // 回复目标
-                        User target = reply.getTargetId() == 0 ? null : userService.selectById(reply.getTargetId());
+                        User target = reply.getTargetId() == null ? null : userService.selectById(reply.getTargetId());
                         replyVo.put("target", target);
                         replyVoList.add(replyVo);
                     }

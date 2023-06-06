@@ -23,6 +23,7 @@ public class Message extends Model<Message> {
     private String conversationId;
     
     private String content;
+
     //0-未读;1-已读;2-删除;
     private Integer status;
     

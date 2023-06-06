@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import com.chenzhihui.community.entity.DiscussPost;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * (DiscussPost)表数据库访问层
@@ -45,6 +46,14 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      * @return DiscussPost 帖子信息
      */
     DiscussPost selectDiscussPostById(int id);
+
+    /**
+     * 修改帖子的评论数量
+     *
+     * @param discussPostId,count 帖子Id
+     * @return int 修改的条数
+     */
+    int updateDiscussCount(int discussPostId, int count);
 
 
     /**--------------------------------------------------------------------------------------------------------------**/

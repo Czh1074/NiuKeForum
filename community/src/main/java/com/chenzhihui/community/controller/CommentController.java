@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.service.CommentService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,7 +21,7 @@ import java.util.List;
  * @author makejava
  * @since 2023-05-19 23:46:44
  */
-@RestController
+@Controller
 @RequestMapping("comment")
 public class CommentController extends ApiController {
     /**
@@ -28,6 +29,25 @@ public class CommentController extends ApiController {
      */
     @Resource
     private CommentService commentService;
+
+
+    @RequestMapping(value = "/add/{discussPostId}", method = RequestMethod.POST)
+    public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment) {
+        commentService.addComment(comment);
+        return "redirect:/discuss/detail/" + discussPostId;
+    }
+
+
+
+
+
+
+
+
+
+
+    /**--------------------------------------------------------------------------------------------------------------**/
+
 
     /**
      * 分页查询所有数据

@@ -21,8 +21,10 @@ public class DiscussPost extends Model<DiscussPost> {
     private String title;
     
     private String content;
+
     //0-普通; 1-置顶;
     private Integer type;
+
     //0-正常; 1-精华; 2-拉黑;
     private Integer status;
     
