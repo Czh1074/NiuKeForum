@@ -36,7 +36,6 @@
         select id, user_id, entity_type, entity_id, target_id, content, status, create_time
         from comment
         where #entity_type = {entityType}, #entity_id = {entityId}
-
     </select>
 
     <select id="selectCountByEntity" resultType="Integer">
@@ -52,4 +51,3 @@
     </insert>
 
 </mapper>
-

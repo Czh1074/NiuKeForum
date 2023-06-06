@@ -12,6 +12,11 @@
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <sql id="selectFields">
+        id, from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+
+
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
         insert into community.message(from_id, to_id, conversation_id, content, status, create_time)
@@ -30,5 +35,34 @@
         on duplicate key update
          from_id = values(from_id) , to_id = values(to_id) , conversation_id = values(conversation_id) , content = values(content) , status = values(status) , create_time = values(create_time)     </insert>
 
+
+    <select id="selectConversationCount" resultType="int" parameterType="int">
+        select count(m.maxid) from (
+                                       select max(id) as maxid from message
+                                       where status != 2
+            and from_id != 1
+            and (from_id = #{userId} or to_id = #{userId})
+                                       group by conversation_id
+                                   ) as m
+    </select>
+
+    <select id="selectLetterCount" resultType="int" parameterType="String">
+        select count(id)
+        from message
+        where status != 2
+        and from_id != 1
+        and conversation_id = #{conversationId}
+    </select>
+
+    <select id="selectLetterUnreadCount" resultType="int">
+        select count(id)
+        from message
+        where status = 0
+        and from_id != 1
+        and to_id = #{userId}
+        <if test="conversationId!=null">
+            and conversation_id = #{conversationId}
+        </if>
+    </select>
 </mapper>
 
