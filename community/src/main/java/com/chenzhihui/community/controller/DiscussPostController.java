@@ -12,10 +12,12 @@ import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.CommentService;
 import com.chenzhihui.community.service.DiscussPostService;
+import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +35,7 @@ import java.util.*;
  * @since 2023-05-19 23:47:05
  */
 @Controller
+@Slf4j
 public class DiscussPostController extends ApiController implements CommunityConstant {
     /**
      * 服务对象
@@ -48,6 +51,10 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Resource
+    private LikeService likeService;
+
 
 
     // 首页展示
@@ -69,6 +76,9 @@ public class DiscussPostController extends ApiController implements CommunityCon
                 map.put("post", discussPost);
                 User user = userService.selectById(discussPost.getUserId());
                 map.put("user", user);
+                // 点赞数量
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, discussPost.getId());
+                map.put("likeCount", likeCount);
                 discussPosts.add(map);
             }
         }
@@ -98,15 +108,19 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
     @RequestMapping(value = "/discuss/detail/{id}", method = RequestMethod.GET)
     public String selectDiscussPostById(@PathVariable("id") int id, Model model, Pages pages) {
-        System.out.println("我进来帖子详情页！！！！");
         // 通过discussPostId查找得到帖子信息
         DiscussPost discussPost = discussPostService.selectDiscussPostById(id);
         model.addAttribute("post",discussPost);
-
         // 作者
         User user = userService.selectById(discussPost.getUserId());
         model.addAttribute("user", user);
-
+        // 点赞
+        long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, id);
+        model.addAttribute("likeCount", likeCount);
+        // 点赞状态:
+        int likeStatus = hostHolder.getUser() == null ? 0 :
+                likeService.findEntityLikeStatus(hostHolder.getUser().getId(), ENTITY_TYPE_POST, id);
+        model.addAttribute("likeStatus", likeStatus);
         // 评论分页设置
         pages.setRows(discussPost.getCommentCount());
         pages.setPath("/discuss/detail/" + id);
@@ -127,6 +141,13 @@ public class DiscussPostController extends ApiController implements CommunityCon
                 commentVo.put("comment", comment);
                 // 作者
                 commentVo.put("user",userService.selectById(comment.getUserId()));
+                // 评论的点赞
+                long commentLikeCount = likeService.findEntityLikeCount(ENTITY_TYPE_COMMENT, comment.getEntityId());
+                commentVo.put("commentLikeCount", commentLikeCount);
+                // 点赞状态
+                likeStatus = hostHolder.getUser() == null ? 0 :
+                        likeService.findEntityLikeStatus(hostHolder.getUser().getId(), ENTITY_TYPE_COMMENT, comment.getEntityId());
+                commentVo.put("likeStatus", likeStatus);
                 // 回复列表
                 List<Comment> replyList = commentService.selectCommentsByEntity(ENTITY_TYPE_COMMENT, comment.getId(),
                         0, Integer.MAX_VALUE);
@@ -138,6 +159,12 @@ public class DiscussPostController extends ApiController implements CommunityCon
                         HashMap<String, Object> replyVo = new HashMap<>();
                         // 回复
                         replyVo.put("reply", reply);
+                        // 回复的点赞
+                        long replyLikeCount = likeService.findEntityLikeCount(ENTITY_TYPE_COMMENT, reply.getEntityId());
+                        replyVo.put("replyLikeCount", replyLikeCount);
+                        likeStatus = hostHolder.getUser() == null ? 0 :
+                                likeService.findEntityLikeStatus(hostHolder.getUser().getId(), ENTITY_TYPE_COMMENT, reply.getEntityId());
+                        replyVo.put("likeStatus", likeStatus);
                         // 作者
                         replyVo.put("user", userService.selectById(reply.getUserId()));
                         // 回复目标
@@ -153,6 +180,10 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
                 commentVoList.add(commentVo);
             }
+        }
+
+        for (Map map : commentVoList) {
+            log.info("组合成的信息为：" + map.toString());
         }
 
         model.addAttribute("comments", commentVoList);

@@ -32,7 +32,6 @@ public class MailTests {
         Context context = new Context();
         context.setVariable("email", "czh1074@163.com");
         // 点击链接完成验证 :
-        // todo：url这样拼接的作用是什么？
 //        String url = domain + "/activation/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", "xx");
 //        mailUtil.sendMail("czh1074@163.com", "问候", "你好啊");

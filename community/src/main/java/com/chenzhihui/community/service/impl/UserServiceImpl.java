@@ -102,7 +102,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Context context = new Context();
         context.setVariable("email", user.getEmail());
         // 点击链接完成验证 :
-        // todo：url这样拼接的作用是什么？
         String url = domain + "/activation/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", url);
         String content = templateEngine.process("/mail/activation", context);
@@ -116,7 +115,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if(user.getStatus() == 1){
             return ACTIVATION_REPEAT;
         } else if(user.getActivationCode().equals(code)){
-            // todo: 实现通过id查找用户，修改用户激活状态
             userMapper.updateStatus(id, 1);
             return ACTIVATION_SUCCESS;
         } else {

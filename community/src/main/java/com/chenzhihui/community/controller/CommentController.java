@@ -6,18 +6,21 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chenzhihui.community.annotation.LoginRequired;
 import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.service.CommentService;
+import com.chenzhihui.community.util.HostHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
  * (Comment)表控制层
- *
+ * todo：删除评论 -> 如果是回复的话直接删除；如果是评论的话设置该评论已被删除，保留回复
  * @author makejava
  * @since 2023-05-19 23:46:44
  */
@@ -30,7 +33,10 @@ public class CommentController extends ApiController {
     @Resource
     private CommentService commentService;
 
+    @Resource
+    private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(value = "/add/{discussPostId}", method = RequestMethod.POST)
     public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment) {
         commentService.addComment(comment);
