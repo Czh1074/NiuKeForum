@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenzhihui.community.annotation.LoginRequired;
 import com.chenzhihui.community.entity.User;
+import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/user")
+@Slf4j
 public class UserController extends ApiController {
 
     /**
@@ -50,6 +53,9 @@ public class UserController extends ApiController {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Resource
+    private LikeService likeService;
 
     /**
      * 通过id查找用户
@@ -122,6 +128,26 @@ public class UserController extends ApiController {
         fis.close();
         os.close();
     }
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) {
+        User user = userService.selectById(userId);
+        log.info("当前点击的用户是谁，编号是多少：" + userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        log.info("当前用户收到的点赞数是多少：" + likeCount);
+        model.addAttribute("likeCount", likeCount);
+
+        return "/site/profile";
+    }
+
 
 
 
