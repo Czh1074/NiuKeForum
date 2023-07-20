@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.entity.DiscussPost;
 import com.chenzhihui.community.entity.Pages;
@@ -14,7 +15,6 @@ import com.chenzhihui.community.service.CommentService;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.service.UserService;
-import com.chenzhihui.community.util.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.jws.WebParam;
 import java.io.Serializable;
 import java.util.*;
 
@@ -180,10 +179,6 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
                 commentVoList.add(commentVo);
             }
-        }
-
-        for (Map map : commentVoList) {
-            log.info("组合成的信息为：" + map.toString());
         }
 
         model.addAttribute("comments", commentVoList);

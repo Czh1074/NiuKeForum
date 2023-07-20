@@ -10,8 +10,7 @@ import com.chenzhihui.community.mapper.CommentMapper;
 import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.service.CommentService;
-import com.chenzhihui.community.service.DiscussPostService;
-import com.chenzhihui.community.util.CommunityConstant;
+import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.util.HostHolder;
 import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.annotation.Resource;

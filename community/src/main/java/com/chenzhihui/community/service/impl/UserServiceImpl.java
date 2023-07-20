@@ -1,19 +1,17 @@
 package com.chenzhihui.community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chenzhihui.community.entity.LoginTicket;
 import com.chenzhihui.community.mapper.LoginTicketMapper;
 import com.chenzhihui.community.mapper.UserMapper;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
-import com.chenzhihui.community.util.CommunityConstant;
+import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.MailUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;

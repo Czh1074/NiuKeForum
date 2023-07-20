@@ -61,18 +61,14 @@ public class LikeServiceImpl implements LikeService {
     // 查询某人对实体对点赞状态
     public int findEntityLikeStatus(int userId, int entityType, int entityId) {
         String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
-        log.info("查询点赞状态是否存在：" + redisTemplate.opsForSet().isMember(entityLikeKey, userId));
         int isIn = redisTemplate.opsForSet().isMember(entityLikeKey, userId) ? 1 : 0;
-        log.info("点赞信息转换：" + isIn);
         return redisTemplate.opsForSet().isMember(entityLikeKey, userId) ? 1 : 0;
     }
 
     // 查询某个用户获得的赞
     public int findUserLikeCount(int userId) {
         String userLikeKey = RedisKeyUtil.getUserLikeKey(userId);
-        log.info("当前查询用户组合redis键值key是：" + userLikeKey);
         Integer count = (Integer) redisTemplate.opsForValue().get(userLikeKey);
-        log.info("输出查询到的count = " + count);
         return count == null ? 0 : count.intValue();
     }
 

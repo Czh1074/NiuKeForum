@@ -65,7 +65,6 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         User user = hostHolder.getUser();
         if (user != null && modelAndView != null){
             modelAndView.addObject("loginUser", user);
-
         }
     }
 

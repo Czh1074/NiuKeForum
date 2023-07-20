@@ -1,8 +1,8 @@
 package com.chenzhihui.community.controller;
 
+import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
-import com.chenzhihui.community.util.CommunityConstant;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
