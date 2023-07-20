@@ -8,11 +8,14 @@ package com.chenzhihui.community.util;
  **/
 public class RedisKeyUtil {
 
-    public static final String SPLIT = ":";
-    public static final String  PREFIX_ENTITY_LIKE = "like:entity";
-    public static final String  PREFIX_USER_LIKE = "like:user";
-    public static final String PREFIX_FOLLOWEE = "followee";
-    public static final String PREFIX_FOLLOWER = "follower";
+    private static final String SPLIT = ":";
+    private static final String  PREFIX_ENTITY_LIKE = "like:entity";
+    private static final String  PREFIX_USER_LIKE = "like:user";
+    private static final String PREFIX_FOLLOWEE = "followee";
+    private static final String PREFIX_FOLLOWER = "follower";
+    private static final String PREFIX_KAPTCHA = "kaptcha";
+    private static final String PREFIX_TICKET = "ticket";
+    private static final String PREFIX_USER = "user";
 
 
     // 某个实体的赞
@@ -35,6 +38,22 @@ public class RedisKeyUtil {
     public static String getFollowerKey(int entityType, int entityId) {
         return PREFIX_FOLLOWER + SPLIT + entityType + SPLIT + entityId;
     }
+
+    // 登陆验证码
+    public static String getKaptchaKey(String owner) {
+        return PREFIX_KAPTCHA + SPLIT + owner;
+    }
+
+    // 登陆的凭证
+    public static String getTicketKey(String ticket) {
+        return PREFIX_TICKET + SPLIT + ticket;
+    }
+
+    // 用户
+    public static String getUserKey(int userId) {
+        return PREFIX_USER + SPLIT + userId;
+    }
+
 
 
 }
