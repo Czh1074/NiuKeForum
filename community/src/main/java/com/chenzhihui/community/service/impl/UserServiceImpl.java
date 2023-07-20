@@ -1,5 +1,6 @@
 package com.chenzhihui.community.service.impl;
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chenzhihui.community.entity.LoginTicket;
 import com.chenzhihui.community.mapper.LoginTicketMapper;
@@ -9,9 +10,11 @@ import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.MailUtil;
+import com.chenzhihui.community.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * (User)表服务实现类
@@ -47,6 +51,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Value("${community.path.domain}")
     private String domain;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     // 实现注册逻辑的具体实现累
     @Override
@@ -122,7 +129,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User selectById(int id) {
-        return userMapper.selectById(id);
+        String userKey = RedisKeyUtil.getUserKey(id);
+        User user = (User) redisTemplate.opsForValue().get(userKey);
+        if (user == null) {
+            user = initCache(id);
+        }
+        return user;
     }
 
 
@@ -171,7 +183,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         loginTicket.setTicket(CommunityUtil.generateUUID());
         loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
-        loginTicketMapper.insert(loginTicket);
+
+        String ticketKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        redisTemplate.opsForValue().set(ticketKey, loginTicket);
 
         map.put("ticket", loginTicket.getTicket());
 
@@ -185,7 +199,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public int updateHeader(int id, String headerUrl) {
-        return userMapper.updateHeader(id, headerUrl);
+        int rows = userMapper.updateHeader(id, headerUrl);
+        clearCache(id);
+        return rows;
+    }
+
+
+    // 1、优先取缓存在redis的数据
+    private User getCache(int userId) {
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        User user = (User) redisTemplate.opsForValue().get(userKey);
+        return user;
+    }
+
+    // 2、redis中取不到值的时候，从mysql中取，并初始化缓存数据
+    private User initCache(int userId) {
+        User user = userMapper.selectById(userId);
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.opsForValue().set(userKey, user, 3600, TimeUnit.SECONDS);
+        return user;
+    }
+
+    // 3、数据变更的时候清除缓存数据
+    private void clearCache(int userId) {
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.delete(userKey);
     }
 
 

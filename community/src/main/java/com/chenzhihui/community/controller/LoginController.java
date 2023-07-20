@@ -1,13 +1,19 @@
 package com.chenzhihui.community.controller;
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.chenzhihui.community.constant.CommunityConstant;
+import com.chenzhihui.community.entity.LoginTicket;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.util.CommunityUtil;
+import com.chenzhihui.community.util.RedisKeyUtil;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.servlet.ServletOutputStream;
@@ -24,6 +31,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 登录控制类
@@ -40,6 +48,12 @@ public class LoginController implements CommunityConstant {
 
     @Autowired
     private Producer kaptchaProducer;
+
+    @Value("/")
+    private String contextPath;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String getRegisterPage(){
@@ -86,15 +100,22 @@ public class LoginController implements CommunityConstant {
 
 
     @RequestMapping(value = "/kaptcha", method = RequestMethod.GET)
-    public void getKaptcha(HttpServletResponse response, HttpSession session) throws IOException {
+    public void getKaptcha(HttpServletResponse response) throws IOException {
 
         // 生成验证码
         String text = kaptchaProducer.createText();
         // 通过验证码，生成对应的图片
         BufferedImage image = kaptchaProducer.createImage(text);
 
-        // 将验证码存入session智能鼓
-        session.setAttribute("kaptcha", text);
+        // 1、设置该验证码的归属者
+        String kaptchaOwner = CommunityUtil.generateUUID();
+        Cookie cookie = new Cookie("kaptchaOwner", kaptchaOwner);
+        cookie.setMaxAge(60);
+        cookie.setPath(contextPath);
+        response.addCookie(cookie);
+        // 2、将验证码存入redis中
+        String kaptchaKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+        redisTemplate.opsForValue().set(kaptchaKey, text, 60, TimeUnit.SECONDS);
 
         // 将图片返回给浏览器
         response.setContentType("image/png");
@@ -105,10 +126,14 @@ public class LoginController implements CommunityConstant {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(String username, String password, String code, boolean rememberme,
-                        Model model, HttpSession session, HttpServletResponse response) {
+                        Model model, HttpServletResponse response, @CookieValue("kaptchaOwner") String kaptchaOwner) {
 
         // 检查验证码
-        String kaptcha = (String) session.getAttribute("kaptcha");
+        String kaptcha = null;
+        if (StringUtils.isNotBlank(kaptchaOwner)) {
+            String kaptchaKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+            kaptcha = (String) redisTemplate.opsForValue().get(kaptchaKey);
+        }
         System.out.println("code = " + code);
         System.out.println("kaptcha = " + kaptcha);
         if(StringUtils.isBlank(kaptcha) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(kaptcha)) {
@@ -137,7 +162,10 @@ public class LoginController implements CommunityConstant {
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String loginOut(@CookieValue("ticket") String ticket) {
-        userService.logout(ticket);
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(ticketKey);
+        loginTicket.setStatus(1);
+        redisTemplate.opsForValue().set(ticketKey, loginTicket);
         return "redirect:/login";
     }
 }

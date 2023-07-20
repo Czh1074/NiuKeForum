@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Update;
  * @DateTime: 2023/6/1 17:58
  **/
 
+@Deprecated
 public interface LoginTicketMapper extends BaseMapper<LoginTicket> {
 
     // 增加一条登录凭证

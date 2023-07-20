@@ -42,9 +42,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 
         if(ticket != null) {
             // 查询凭证
-            QueryWrapper<LoginTicket> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("ticket", ticket);
-            LoginTicket loginTicket = loginTicketService.getOne(queryWrapper);
+            LoginTicket loginTicket = loginTicketService.findLoginTicket(ticket);
             // 检查凭证是否有效
             if(loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())){
                 // 符合条件的是凭证有效 -> 查询用户

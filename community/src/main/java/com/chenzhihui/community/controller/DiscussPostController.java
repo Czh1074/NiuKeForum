@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chenzhihui.community.annotation.LoginRequired;
 import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.entity.DiscussPost;
@@ -105,6 +106,7 @@ public class DiscussPostController extends ApiController implements CommunityCon
         return CommunityUtil.getJsonString(0, "发布成功！");
     }
 
+    @LoginRequired
     @RequestMapping(value = "/discuss/detail/{id}", method = RequestMethod.GET)
     public String selectDiscussPostById(@PathVariable("id") int id, Model model, Pages pages) {
         // 通过discussPostId查找得到帖子信息

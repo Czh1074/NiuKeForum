@@ -12,4 +12,12 @@ public interface LoginTicketService extends IService<LoginTicket> {
 
     // 修改登录状态
     int updateStatus(String ticket, int status);
+
+    /**
+     * 查找当前登陆凭证
+     *
+     * @param ticket 登陆凭证
+     * @return 登陆凭证实体
+     */
+    public LoginTicket findLoginTicket(String ticket);
 }

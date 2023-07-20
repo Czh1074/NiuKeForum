@@ -1,6 +1,7 @@
 package com.chenzhihui.community.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.chenzhihui.community.entity.LoginTicket;
 import com.chenzhihui.community.entity.User;
 
 import javax.mail.MessagingException;
@@ -63,6 +64,7 @@ public interface UserService extends IService<User> {
      * @return 是否修改成功
      */
     int updateHeader(int id, String headerUrl);
+
 
 
     /** -------------------------------------------------------------------------------------------------------------**/
