@@ -1,12 +1,15 @@
 package com.chenzhihui.community.controller;
 
+import com.chenzhihui.community.entity.Event;
 import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
+import com.chenzhihui.community.event.EventProducer;
 import com.chenzhihui.community.service.FollowService;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 import java.util.Map;
 
 import static com.chenzhihui.community.constant.CommunityConstant.ENTITY_TYPE_USER;
+import static com.chenzhihui.community.constant.CommunityConstant.TOPIC_FOLLOW;
 
 /**
  * 关注控制层
@@ -41,11 +44,24 @@ public class FollowController {
     @Resource
     private UserService userService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
         followService.follow(user.getId(), entityType, entityId);
+
+        // 触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+        eventProducer.fireEvent(event);
+
         return CommunityUtil.getJsonString(0, "已关注！");
     }
 

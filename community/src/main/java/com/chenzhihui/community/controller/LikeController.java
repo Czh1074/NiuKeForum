@@ -1,18 +1,22 @@
 package com.chenzhihui.community.controller;
 
+import com.chenzhihui.community.entity.Event;
 import com.chenzhihui.community.entity.User;
+import com.chenzhihui.community.event.EventProducer;
 import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Priority;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.chenzhihui.community.constant.CommunityConstant.TOPIC_LIKE;
 
 /**
  * 点赞实现控制层
@@ -30,9 +34,12 @@ public class LikeController {
     @Resource
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/like", method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType, int entityId, int entityUserId) {
+    public String like(int entityType, int entityId, int entityUserId, int postId) {
         User user = hostHolder.getUser();
 
         // 实现点赞
@@ -46,7 +53,18 @@ public class LikeController {
         map.put("likeCount", likeCount);
         map.put("likeStatus", likeStatus);
 
-        return CommunityUtil.getJsonString(0,null, map);
+        // 触发点赞事件
+        if (likeStatus == 1) {
+            Event event = new Event()
+                    .setTopic(TOPIC_LIKE)
+                    .setUserId(hostHolder.getUser().getId())
+                    .setEntityType(entityType)
+                    .setEntityUserId(entityUserId)
+                    .setData("postId", postId);
+            eventProducer.fireEvent(event);
+        }
+
+        return CommunityUtil.getJsonString(0, null, map);
 
     }
 
