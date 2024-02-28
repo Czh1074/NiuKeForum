@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.chenzhihui.community.entity.User;
-import com.chenzhihui.community.mapper.MessageMapper;
 import com.chenzhihui.community.entity.Message;
+import com.chenzhihui.community.mapper.MessageMapper;
 import com.chenzhihui.community.service.MessageService;
-import com.chenzhihui.community.util.HostHolder;
 import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,6 +102,21 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     public int readMessage(List<Integer> ids) {
         System.out.println("我先在执行messageService中的设置已读方法");
         return messageMapper.updateStatus(ids, 1);
+    }
+
+    @Override
+    public Message selectLatestNotice(int userId, String topic) {
+        return messageMapper.selectLatestNotice(userId, topic);
+    }
+
+    @Override
+    public int selectNoticeCount(int userId, String topic) {
+        return messageMapper.selectNoticeCount(userId, topic);
+    }
+
+    @Override
+    public int selectNoticeUnreadCount(int userId, String topic) {
+        return messageMapper.selectNoticeUnreadCount(userId, topic);
     }
 
 }

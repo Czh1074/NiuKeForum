@@ -1,11 +1,7 @@
 package com.chenzhihui.community.controller;
 
 
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenzhihui.community.entity.Message;
 import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
@@ -16,10 +12,12 @@ import com.chenzhihui.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -153,7 +151,17 @@ public class MessageController extends ApiController {
     }
 
 
+    @RequestMapping(path = "/notice/list", method = RequestMethod.GET)
+    public String getNoticeList(Model model) {
+        User user = hostHolder.getUser();
 
+        // 查询评论类通知
+
+        // 查询点赞类通知
+
+        // 查询关注类通知
+        return "true";
+    }
 
 
 

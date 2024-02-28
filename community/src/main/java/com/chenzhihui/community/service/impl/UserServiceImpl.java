@@ -1,13 +1,12 @@
 package com.chenzhihui.community.service.impl;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.entity.LoginTicket;
+import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.mapper.LoginTicketMapper;
 import com.chenzhihui.community.mapper.UserMapper;
-import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.service.UserService;
-import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.MailUtil;
 import com.chenzhihui.community.util.RedisKeyUtil;
@@ -55,7 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private RedisTemplate redisTemplate;
 
-    // 实现注册逻辑的具体实现累
+    // 实现注册逻辑的具体实现
     @Override
     public Map<String, Object> register(User user) throws MessagingException {
 

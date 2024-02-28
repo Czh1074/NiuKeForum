@@ -56,6 +56,8 @@ public class CommentController extends ApiController {
         comment.setUserId(hostHolder.getUser().getId());
         comment.setStatus(0);
         comment.setCreateTime(new Date());
+        comment.setTargetId(comment.getEntityId());
+        comment.setTargetId(discussPostId);
         commentService.addComment(comment);
 
         // 触发评论事件

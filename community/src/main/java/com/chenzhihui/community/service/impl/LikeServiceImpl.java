@@ -1,5 +1,6 @@
 package com.chenzhihui.community.service.impl;
 
+import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.util.RedisKeyUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,9 @@ public class LikeServiceImpl implements LikeService {
     @Resource
     private RedisTemplate redisTemplate;
 
+    @Resource
+    private DiscussPostService discussPostService;
+
     // 点赞
 
     public void like(int userId, int entityType, int entityId, int entityUserId) {
@@ -36,15 +40,18 @@ public class LikeServiceImpl implements LikeService {
                 String userLikeKey = RedisKeyUtil.getUserLikeKey(entityUserId);
                 // 判断是否当前用户是否点赞
                 Boolean isMember = operations.opsForSet().isMember(entityLikeKey, userId);
+                int likeCount = discussPostService.selectDiscussPostById(entityId).getLikeCount();
                 // 执行事务，保证isMember能够成功执行方法得到查询 -> 数据一致性
                 operations.multi();
                 if (isMember) {
                     // 执行点赞和用户得到点赞数操作
                     operations.opsForSet().remove(entityLikeKey, userId);
                     operations.opsForValue().decrement(userLikeKey);
+                    discussPostService.updateDiscussPostLikeCount(entityId, likeCount - 1);
                 } else {
                     operations.opsForSet().add(entityLikeKey, userId);
                     operations.opsForValue().increment(userLikeKey);
+                    discussPostService.updateDiscussPostLikeCount(entityId, likeCount + 1);
                 }
 
                 return operations.exec();

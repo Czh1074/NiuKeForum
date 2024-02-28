@@ -1,10 +1,10 @@
 package com.chenzhihui.community.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 import com.chenzhihui.community.entity.Message;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (Message)表数据库访问层
@@ -16,13 +16,13 @@ public interface MessageMapper extends BaseMapper<Message> {
 
 
     // 查询当前用户对会话列表，针对每个会话返回一条最新的私信
-    List<Message> selectConversations(int userId, int offset, int limit);
+//    List<Message> selectConversations(int userId, int offset, int limit);
 
     // 查询当前用户的会话数量（所有会话数量）
     int selectConversationCount(int userId);
 
     // 查询某个会话所包含的私信列表（相当于a和b之间的对话）
-    List<Message> selectLetters(String ConversationId, int offset, int limit);
+//    List<Message> selectLetters(String ConversationId, int offset, int limit);
 
     // 查询某个会话所包含的私信数量（会话的右侧，显示几条对话）
     int selectLetterCount(String ConversationId);
@@ -35,6 +35,15 @@ public interface MessageMapper extends BaseMapper<Message> {
 
     // 修改消息阅读状态
     int updateStatus(List<Integer> ids, int status);
+
+    // 查询某个主题下最新的通知
+    Message selectLatestNotice(int userId, String topic);
+
+    // 查询某个主题下所包含的通知数量
+    int selectNoticeCount(int userId, String topic);
+
+    // 查询未读的通知的数量
+    int selectNoticeUnreadCount(int userId, String topic);
 
 
     /**--------------------------------------------------------------------------------------------------------------**/

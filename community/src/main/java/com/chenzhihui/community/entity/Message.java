@@ -2,6 +2,7 @@ package com.chenzhihui.community.entity;
 
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,7 +25,7 @@ public class Message extends Model<Message> {
     
     private String content;
 
-    //0-未读;1-已读;2-删除;
+    // 0-未读;1-已读;2-删除;
     private Integer status = 0;
     
     private Date createTime;
@@ -85,6 +86,7 @@ public class Message extends Model<Message> {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
 
     /**
      * 获取主键值

@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chenzhihui.community.constant.CommunityConstant;
+import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.entity.DiscussPost;
 import com.chenzhihui.community.entity.User;
 import com.chenzhihui.community.mapper.CommentMapper;
-import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.service.CommentService;
-import com.chenzhihui.community.constant.CommunityConstant;
 import com.chenzhihui.community.util.HostHolder;
 import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +70,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public int addComment(Comment comment) {
         // 1、查找帖子、将帖子回帖数量+1
-        DiscussPost discussPost = discussPostMapper.selectDiscussPostById(comment.getEntityId());
-        discussPostMapper.updateDiscussCount(comment.getEntityId(),discussPost.getCommentCount()+1);
+        DiscussPost discussPost = discussPostMapper.selectDiscussPostById(comment.getTargetId());
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+            discussPostMapper.updateDiscussCount(comment.getTargetId(), discussPost.getCommentCount() + 1);
+        }
+        discussPostMapper.updateDiscussCount(comment.getTargetId(), discussPost.getCommentCount() + 1);
         // 2、通过hostHolder查找当前用户，获取用户id，实现comment信息的添加
         User user = hostHolder.getUser();
         if(user == null){
@@ -79,7 +82,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         comment.setUserId(user.getId());
         comment.setEntityType(comment.getEntityType());
-        comment.setEntityId(comment.getEntityId());
+//        comment.setEntityId(comment.getEntityId());
+//        if (comment.getEntityId() == ENTITY_TYPE_COMMENT) {
+//            comment.setTargetId(comment.getEntityId());
+//        }
         comment.setContent(HtmlUtils.htmlEscape(comment.getContent()));
         comment.setContent(sensitiveFilter.filter(comment.getContent()));
         comment.setCreateTime(new Date());

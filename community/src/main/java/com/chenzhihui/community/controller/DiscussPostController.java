@@ -59,14 +59,13 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
     // 首页展示
     @RequestMapping(value = "/index", method = RequestMethod.GET)
-    public String selectAllDiscussPost(Model model, Pages pages) {
+    public String selectAllDiscussPost(Model model, Pages pages, @RequestParam(name = "orderMode", defaultValue = "0") int orderMode) {
         // 方法调用栈、SpringMVC会自动实例化Model和Page，并将Page注入Model中
         // 所以，在thymeleaf中可以直接访问Page这中对象的数据
-        List<DiscussPost> list = discussPostService.selectDiscussPosts(149, pages.getCurrent(), pages.getLimit());
+        List<DiscussPost> list = discussPostService.selectDiscussPosts(0, pages.getCurrent(), pages.getLimit(), orderMode);
         // 这里的rows需要查找所有的信息
-        int all = discussPostService.selectAllDiscussPosts(149).size();
+        int all = discussPostService.selectAllDiscussPosts(0).size();
         pages.setRows(all);
-        System.out.println(all);
         pages.setPath("/index");
 
         List<Map<String, Object>> discussPosts = new ArrayList<>();
@@ -82,6 +81,7 @@ public class DiscussPostController extends ApiController implements CommunityCon
                 discussPosts.add(map);
             }
         }
+        model.addAttribute("orderMode", orderMode);
         model.addAttribute("discussPosts", discussPosts);
         return "/index";
     }

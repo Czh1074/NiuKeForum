@@ -13,13 +13,17 @@ import java.util.List;
  */
 public interface DiscussPostService extends IService<DiscussPost> {
 
-    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit);
+    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit, int orderMode);
 
     List<DiscussPost> selectAllDiscussPosts(int userId);
 
     int insertDiscussPost(DiscussPost discussPost);
 
     DiscussPost selectDiscussPostById(int id);
+
+    int updateDiscussPostLikeCount(int postId, int likeCount);
+
+
 
 
 

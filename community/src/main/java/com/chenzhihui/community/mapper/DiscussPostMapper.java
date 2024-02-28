@@ -1,11 +1,10 @@
 package com.chenzhihui.community.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 import com.chenzhihui.community.entity.DiscussPost;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (DiscussPost)表数据库访问层
@@ -21,7 +20,7 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      * @param userId,offset,limit 用户id、偏移量、每页最大数目
      * @return List<DiscussPost> 实例对象列表
      */
-    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit);
+//    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit, int orderMode);
 
     /**
      * 查询帖子列表
@@ -29,7 +28,7 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      * @param userId 用户id
      * @return List<DiscussPost> 实例对象列表
      */
-    List<DiscussPost> selectAllDiscussPosts(int userId);
+//    List<DiscussPost> selectAllDiscussPosts(int userId);
 
     /**
      * 发布帖子
@@ -55,6 +54,14 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      */
     int updateDiscussCount(int discussPostId, int count);
 
+
+    /**
+     * 修改帖子的点赞数量
+     *
+     * @param discussPostId,count 帖子Id
+     * @return int 修改的条数
+     */
+    int updateLikeCount(int discussPostId, int count);
 
     /**--------------------------------------------------------------------------------------------------------------**/
 

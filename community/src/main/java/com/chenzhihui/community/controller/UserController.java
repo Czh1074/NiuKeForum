@@ -1,13 +1,15 @@
 package com.chenzhihui.community.controller;
 
 
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenzhihui.community.annotation.LoginRequired;
+import com.chenzhihui.community.entity.DiscussPost;
+import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
+import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.service.FollowService;
 import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.service.UserService;
@@ -23,11 +25,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.chenzhihui.community.constant.CommunityConstant.ENTITY_TYPE_USER;
 
@@ -62,6 +65,9 @@ public class UserController extends ApiController {
 
     @Resource
     private FollowService followService;
+
+    @Resource
+    private DiscussPostService discussPostService;
 
     /**
      * 通过id查找用户
@@ -165,6 +171,50 @@ public class UserController extends ApiController {
         return "/site/profile";
     }
 
+    // 用户发布的帖子
+    @RequestMapping(path = "/post/{userId}", method = RequestMethod.GET)
+    public String getUserPosts(@PathVariable("userId") int userId, Model model, Pages page) {
+        // 添加用户信息
+        User user = userService.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+        model.addAttribute("user", user);
+        // 帖子总数
+        List<DiscussPost> discussPostList = discussPostService.selectAllDiscussPosts(userId);
+        int postCount = discussPostList.size();
+        model.addAttribute("postCount", postCount);
+
+        // 分页相关参数
+        page.setRows(postCount);
+        page.setPath("/user/post/" + userId);
+
+        // 主语显示：是我的帖子还是他的帖子
+        String subject = "我";
+        user = hostHolder.getUser();
+        if (user == null || userId != user.getId()) {
+            subject = "Ta";
+        }
+
+        // 小标题显示信息
+        model.addAttribute("subject", subject);
+
+        // 帖子信息
+        List<DiscussPost> list = discussPostService.selectDiscussPosts(userId, page.getFrom(), page.getLimit(), 0);
+        List<Map<String, Object>> discussPosts = new ArrayList<>();
+        if (list != null) {
+            for (DiscussPost post : list) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("post", post);
+                map.put("likeCount", post.getLikeCount());
+                discussPosts.add(map);
+            }
+        }
+        // 帖子相关信息
+        model.addAttribute("discussPosts", discussPosts);
+
+        return "/site/my-post";
+    }
 
 
 

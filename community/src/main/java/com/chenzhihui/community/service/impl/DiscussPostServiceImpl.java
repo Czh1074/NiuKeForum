@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.entity.DiscussPost;
+import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,16 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
     private SensitiveFilter sensitiveFilter;
 
     @Override
-    public List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit) {
+    public List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit, int orderMode) {
         IPage<DiscussPost> page = new Page<>(offset, limit);
         QueryWrapper<DiscussPost> queryWrapper = new QueryWrapper<>();
         if(userId != 0){
             queryWrapper.eq("user_id",userId);
+        }
+        if (orderMode == 0) { // 最新，按照时间排序首页数据
+            queryWrapper.orderByDesc("create_time");
+        } else {
+            queryWrapper.orderByDesc("score");
         }
         IPage<DiscussPost> discussPostIPage = discussPostMapper.selectPage(page, queryWrapper);
         // 将discussPostIPage里的数据提提取出来
@@ -54,7 +59,9 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
     public List<DiscussPost> selectAllDiscussPosts(int userId) {
         // 获得userID下的所有信息
         QueryWrapper<DiscussPost> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
+        if (userId != 0) {
+            queryWrapper.eq("user_id", userId);
+        }
         List<DiscussPost> discussPosts = discussPostMapper.selectList(queryWrapper);
         return discussPosts;
     }
@@ -80,6 +87,11 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
     @Override
     public DiscussPost selectDiscussPostById(int id) {
         return discussPostMapper.selectDiscussPostById(id);
+    }
+
+    @Override
+    public int updateDiscussPostLikeCount(int postId, int likeCount) {
+        return discussPostMapper.updateLikeCount(postId, likeCount);
     }
 }
 

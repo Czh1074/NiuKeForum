@@ -2,6 +2,7 @@ package com.chenzhihui.community.entity;
 
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -29,8 +30,10 @@ public class DiscussPost extends Model<DiscussPost> {
     private Integer status;
     
     private Date createTime;
-    
-    private Integer commentCount;
+
+    private Integer commentCount = 0;
+
+    private Integer likeCount = 0;
     
     private Object score;
 
@@ -105,6 +108,14 @@ public class DiscussPost extends Model<DiscussPost> {
 
     public void setScore(Object score) {
         this.score = score;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
     }
 
     /**
