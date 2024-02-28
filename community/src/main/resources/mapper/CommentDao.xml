@@ -13,6 +13,11 @@
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <sql id="selectFields">
+        id
+        , user_id, entity_type, entity_id, target_id, content, status, create_time
+    </sql>
+
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
         insert into community.comment(user_id, entity_type, entity_id, target_id, content, status, create_time)
@@ -49,5 +54,12 @@
         values
         (#{userId}, #{entityType}, #{entityId}, #{targetId}, #{content}, #{status}, #{createTime})
     </insert>
+
+    <select id="selectCommentById" resultType="Comment">
+        select
+        <include refid="selectFields"></include>
+        from comment
+        where id = #{id}
+    </select>
 
 </mapper>

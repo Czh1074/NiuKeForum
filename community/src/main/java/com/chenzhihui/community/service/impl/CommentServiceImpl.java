@@ -92,5 +92,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         System.out.println("comment的用户id = "  + comment.getUserId());
         return commentMapper.addComment(comment);
     }
+
+    @Override
+    public Comment findCommentById(int id) {
+        return commentMapper.selectCommentById(id);
+    }
 }
 

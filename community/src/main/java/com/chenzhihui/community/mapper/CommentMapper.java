@@ -1,10 +1,10 @@
 package com.chenzhihui.community.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 import com.chenzhihui.community.entity.Comment;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (Comment)表数据库访问层
@@ -40,6 +40,14 @@ public interface CommentMapper extends BaseMapper<Comment> {
      * @return int 插入成功条数
      */
     int addComment(Comment comment);
+
+    /**
+     * 通过id查找评论
+     *
+     * @param id 评论id
+     * @return Comment 评论
+     */
+    Comment selectCommentById(int id);
 
     /**--------------------------------------------------------------------------------------------------------------**/
 

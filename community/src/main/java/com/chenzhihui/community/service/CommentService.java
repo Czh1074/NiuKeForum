@@ -19,5 +19,7 @@ public interface CommentService extends IService<Comment> {
 
     int addComment(Comment comment);
 
+    public Comment findCommentById(int id);
+
 }
 
