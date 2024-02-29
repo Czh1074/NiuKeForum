@@ -2,6 +2,7 @@ package com.chenzhihui.community.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.chenzhihui.community.entity.DiscussPost;
+import com.chenzhihui.community.entity.resp.ReplyPostResult;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ public interface DiscussPostService extends IService<DiscussPost> {
     DiscussPost selectDiscussPostById(int id);
 
     int updateDiscussPostLikeCount(int postId, int likeCount);
+
+    List<ReplyPostResult> findReplyDiscussPosts(int userId, int offset, int limit);
 
 
 

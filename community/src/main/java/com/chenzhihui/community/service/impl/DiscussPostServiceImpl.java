@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chenzhihui.community.entity.Comment;
 import com.chenzhihui.community.entity.DiscussPost;
+import com.chenzhihui.community.entity.Pages;
+import com.chenzhihui.community.entity.resp.ReplyPostResult;
+import com.chenzhihui.community.mapper.CommentMapper;
 import com.chenzhihui.community.mapper.DiscussPostMapper;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.util.SensitiveFilter;
@@ -27,6 +31,9 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
 
     @Resource
     private DiscussPostMapper discussPostMapper;
+
+    @Resource
+    private CommentMapper commentMapper;
 
     @Autowired
     private SensitiveFilter sensitiveFilter;
@@ -92,6 +99,32 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
     @Override
     public int updateDiscussPostLikeCount(int postId, int likeCount) {
         return discussPostMapper.updateLikeCount(postId, likeCount);
+    }
+
+    @Override
+    public List<ReplyPostResult> findReplyDiscussPosts(int userId, int offset, int limit) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq("entity_type", 1);
+        queryWrapper.ne("status", 2);
+        Pages pages = new Pages();
+        pages.setCurrent(offset);
+        pages.setLimit(limit);
+        List<Comment> commentList = commentMapper.selectList(queryWrapper);
+
+        List<ReplyPostResult> replyPostResults = new ArrayList<>();
+
+        for (Comment comment : commentList) {
+            ReplyPostResult replyPostResult = new ReplyPostResult();
+            replyPostResult.setReplyContent(comment.getContent());
+            DiscussPost discussPost = discussPostMapper.selectDiscussPostById(comment.getEntityId());
+            replyPostResult.setReplyCreateTime(comment.getCreateTime());
+            replyPostResult.setPostTitle(discussPost.getTitle());
+            replyPostResult.setPostId(discussPost.getId());
+            replyPostResults.add(replyPostResult);
+        }
+        return replyPostResults;
+
     }
 }
 

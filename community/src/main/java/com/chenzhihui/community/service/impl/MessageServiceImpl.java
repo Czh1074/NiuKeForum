@@ -119,5 +119,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return messageMapper.selectNoticeUnreadCount(userId, topic);
     }
 
+    @Override
+    public List<Message> findNotices(int userId, String topic, int offset, int limit) {
+        return messageMapper.selectNotices(userId, topic, offset, limit);
+    }
+
 }
 

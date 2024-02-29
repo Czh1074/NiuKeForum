@@ -97,5 +97,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public Comment findCommentById(int id) {
         return commentMapper.selectCommentById(id);
     }
+
+    @Override
+    public int findPostCommentCountByUserId(int userId, int entityType) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq("entity_type", entityType);
+        queryWrapper.eq("status", 0);
+        return commentMapper.selectCount(queryWrapper);
+    }
 }
 

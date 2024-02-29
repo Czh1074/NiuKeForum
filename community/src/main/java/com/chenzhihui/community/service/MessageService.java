@@ -43,5 +43,7 @@ public interface MessageService extends IService<Message> {
     // 查询未读的通知的数量
     int selectNoticeUnreadCount(int userId, String topic);
 
+    List<Message> findNotices(int userId, String topic, int offset, int limit);
+
 }
 

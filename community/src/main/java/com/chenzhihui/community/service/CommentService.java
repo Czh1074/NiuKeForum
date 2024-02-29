@@ -21,5 +21,7 @@ public interface CommentService extends IService<Comment> {
 
     public Comment findCommentById(int id);
 
+    int findPostCommentCountByUserId(int userId, int entityType);
+
 }
 

@@ -63,6 +63,14 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      */
     int updateLikeCount(int discussPostId, int count);
 
+    /**
+     * 通过用户id和类型查找评论数量
+     *
+     * @param userId,entityType 用户id、类型
+     * @return int 回帖
+     */
+//    List<ReplyPostResult> selectReplyDiscussPosts(int userId, int offset, int limit);
+
     /**--------------------------------------------------------------------------------------------------------------**/
 
 

@@ -9,10 +9,8 @@ import com.chenzhihui.community.annotation.LoginRequired;
 import com.chenzhihui.community.entity.DiscussPost;
 import com.chenzhihui.community.entity.Pages;
 import com.chenzhihui.community.entity.User;
-import com.chenzhihui.community.service.DiscussPostService;
-import com.chenzhihui.community.service.FollowService;
-import com.chenzhihui.community.service.LikeService;
-import com.chenzhihui.community.service.UserService;
+import com.chenzhihui.community.entity.resp.ReplyPostResult;
+import com.chenzhihui.community.service.*;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.chenzhihui.community.constant.CommunityConstant.ENTITY_TYPE_POST;
 import static com.chenzhihui.community.constant.CommunityConstant.ENTITY_TYPE_USER;
 
 /**
@@ -68,6 +67,9 @@ public class UserController extends ApiController {
 
     @Resource
     private DiscussPostService discussPostService;
+
+    @Resource
+    private CommentService commentService;
 
     /**
      * 通过id查找用户
@@ -214,6 +216,30 @@ public class UserController extends ApiController {
         model.addAttribute("discussPosts", discussPosts);
 
         return "/site/my-post";
+    }
+
+    // 用户回复的帖子
+    @RequestMapping(path = "/reply/{userId}", method = RequestMethod.GET)
+    public String getUserReply(@PathVariable("userId") int userId, Model model, Pages page) {
+        // 添加用户信息
+        User user = userService.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+        model.addAttribute("user", user);
+        // 回复的帖子总数
+        int postCount = commentService.findPostCommentCountByUserId(userId, ENTITY_TYPE_POST);
+        model.addAttribute("postCount", postCount);
+
+        // 分页相关参数
+        page.setRows(postCount);
+        page.setPath("/user/reply/" + userId);
+
+        // 帖子及回复相关信息
+        List<ReplyPostResult> list = discussPostService.findReplyDiscussPosts(userId, page.getFrom(), page.getLimit());
+        model.addAttribute("replyPost", list);
+
+        return "/site/my-reply";
     }
 
 
