@@ -126,5 +126,10 @@ public class DiscussPostServiceImpl extends ServiceImpl<DiscussPostMapper, Discu
         return replyPostResults;
 
     }
+
+    @Override
+    public int updateScore(int postId, double score) {
+        return discussPostMapper.updateScore(postId, score);
+    }
 }
 

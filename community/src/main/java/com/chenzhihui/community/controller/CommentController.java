@@ -14,7 +14,9 @@ import com.chenzhihui.community.event.EventProducer;
 import com.chenzhihui.community.service.CommentService;
 import com.chenzhihui.community.service.DiscussPostService;
 import com.chenzhihui.community.util.HostHolder;
+import com.chenzhihui.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +52,9 @@ public class CommentController extends ApiController {
     @Autowired
     private DiscussPostService discussPostService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @LoginRequired
     @RequestMapping(value = "/add/{discussPostId}", method = RequestMethod.POST)
     public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment) {
@@ -70,6 +75,9 @@ public class CommentController extends ApiController {
         if (comment.getEntityType() == ENTITY_TYPE_POST) {
             DiscussPost target = discussPostService.selectDiscussPostById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
+            // 计算帖子分数
+            String redisKey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(redisKey, discussPostId);
         } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {
             Comment target = commentService.getById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());

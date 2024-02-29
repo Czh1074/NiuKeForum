@@ -26,6 +26,9 @@ public interface DiscussPostService extends IService<DiscussPost> {
 
     List<ReplyPostResult> findReplyDiscussPosts(int userId, int offset, int limit);
 
+    // 更新帖子分数
+    int updateScore(int postId, double score);
+
 
 
 

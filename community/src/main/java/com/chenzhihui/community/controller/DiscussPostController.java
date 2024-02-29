@@ -18,8 +18,10 @@ import com.chenzhihui.community.service.LikeService;
 import com.chenzhihui.community.service.UserService;
 import com.chenzhihui.community.util.CommunityUtil;
 import com.chenzhihui.community.util.HostHolder;
+import com.chenzhihui.community.util.RedisKeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +56,9 @@ public class DiscussPostController extends ApiController implements CommunityCon
 
     @Resource
     private LikeService likeService;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
 
 
@@ -101,6 +106,13 @@ public class DiscussPostController extends ApiController implements CommunityCon
         discussPost.setTitle(title);
         discussPost.setContent(content);
         discussPost.setCreateTime(new Date());
+
+        // todo: 触发发帖事件
+
+
+        // 计算帖子分数
+        String redisKey = RedisKeyUtil.getPostScoreKey();
+        redisTemplate.opsForSet().add(redisKey, discussPost.getId());
 
         discussPostService.insertDiscussPost(discussPost);
         return CommunityUtil.getJsonString(0, "发布成功！");

@@ -14,6 +14,7 @@ import com.chenzhihui.community.service.CommentService;
 import com.chenzhihui.community.util.HostHolder;
 import com.chenzhihui.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,6 +46,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Autowired
     private SensitiveFilter sensitiveFilter;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public List<Comment> selectCommentsByEntity(int entityType, int entityId, int offset, int limit) {

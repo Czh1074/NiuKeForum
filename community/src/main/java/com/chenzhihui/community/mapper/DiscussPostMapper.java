@@ -63,6 +63,8 @@ public interface DiscussPostMapper extends BaseMapper<DiscussPost> {
      */
     int updateLikeCount(int discussPostId, int count);
 
+    int updateScore(int postId, double score);
+
     /**
      * 通过用户id和类型查找评论数量
      *

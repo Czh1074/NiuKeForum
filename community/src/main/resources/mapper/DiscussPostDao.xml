@@ -66,5 +66,11 @@
         where id = #{discussPostId}
     </update>
 
+    <update id="updateScore">
+        update discuss_post
+        set score = #{score}
+        where id = #{postId}
+    </update>
+
 </mapper>
 
